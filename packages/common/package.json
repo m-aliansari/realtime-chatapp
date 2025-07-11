@@ -1,0 +1,13 @@
+{
+    "name": "@realtime-chatapp/common",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "type": "module",
+    "exports": {
+        ".": "./index.js"
+    },
+    "dependencies": {
+        "yup": "^1.6.1"
+    }
+}

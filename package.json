@@ -1,0 +1,16 @@
+{
+    "name": "realtime-chatapp",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "scripts": {
+        "start:server": "yarn --cwd packages/server/ dev",
+        "start:client": "yarn --cwd packages/client/ dev",
+        "common": "cd packages/common",
+        "server": "cd packages/server",
+        "client": "cd packages/client"
+    },
+    "workspaces": [
+        "packages/*"
+    ]
+}
