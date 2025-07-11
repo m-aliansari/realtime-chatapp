@@ -9,10 +9,10 @@ import {
 import { useFormik } from "formik";
 import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { object, string } from "yup";
 import { API_BASE_URL } from "../../../constants/api";
 import { UserContext } from "../../../contexts/UserContext";
 import { ROUTE_NAMES } from "../../../constants/routes";
+import { authFormSchema } from "@realtime-chatapp/common";
 
 export const Signup = () => {
   const { setUser } = useContext(UserContext);
@@ -23,16 +23,7 @@ export const Signup = () => {
       username: "",
       password: "",
     },
-    validationSchema: object({
-      username: string()
-        .required("Username required")
-        .min(6, "Username too short")
-        .max(28, "Username too long"),
-      password: string()
-        .required("Password required")
-        .min(6, "Password too short")
-        .max(28, "Password too long"),
-    }),
+    validationSchema: authFormSchema,
     onSubmit: (values, actions) => {
       const vals = { ...values };
       actions.resetForm();
@@ -51,7 +42,7 @@ export const Signup = () => {
         })
         .then((data) => {
           if (!data) return;
-          if (data.status) return setError(data.status)
+          if (data.status) return setError(data.status);
           setUser({ ...data });
           navigate(ROUTE_NAMES.HOME);
         })

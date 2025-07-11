@@ -1,4 +1,4 @@
-import { formSchema } from "@realtime-chatapp/common";
+import { authFormSchema } from "@realtime-chatapp/common";
 
 /**
     * Limits API requests by user IP.
@@ -10,7 +10,7 @@ import { formSchema } from "@realtime-chatapp/common";
 const validateForm = async (req, res, next) => {
     const formData = req.body;
     try {
-        const valid = await formSchema.validate(formData)
+        const valid = await authFormSchema.validate(formData)
         if (!valid) {
             console.log('form is not good')
             res.status(422).send()

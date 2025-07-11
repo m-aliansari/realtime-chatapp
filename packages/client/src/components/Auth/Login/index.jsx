@@ -11,7 +11,7 @@ import { useFormik } from "formik";
 import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../../constants/api";
-import { formSchema } from "@realtime-chatapp/common";
+import { authFormSchema } from "@realtime-chatapp/common";
 import { UserContext } from "../../../contexts/UserContext";
 import { ROUTE_NAMES } from "../../../constants/routes";
 
@@ -25,7 +25,7 @@ export const Login = () => {
       username: "",
       password: "",
     },
-    validationSchema: formSchema,
+    validationSchema: authFormSchema,
     onSubmit: (values, actions) => {
       const vals = { ...values };
       actions.resetForm();

@@ -5,6 +5,7 @@ import { Signup } from "./Auth/Signup";
 import { PrivateRoutes } from "./PrivateRoutes";
 import { Text } from "@chakra-ui/react";
 import { UserContext } from "../contexts/UserContext";
+import { Home } from "./Home";
 
 export const Views = () => {
   const { user } = useContext(UserContext);
@@ -15,7 +16,7 @@ export const Views = () => {
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Signup />} />
       <Route element={<PrivateRoutes />}>
-        <Route path="/home" element={<Text>HI</Text>} />
+        <Route path="/home" element={<Home />} />
       </Route>
       <Route path="*" element={<Login />} />
     </Routes>

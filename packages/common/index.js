@@ -1,6 +1,6 @@
 import { object, string } from "yup"
 
-export const formSchema = object({
+export const authFormSchema = object({
     username: string()
         .required("Username required")
         .min(6, "Username too short")
@@ -12,3 +12,5 @@ export const formSchema = object({
 })
 
 export const appName = 'realtime-chatapp'
+
+export const friendFormSchema = authFormSchema.omit(['password'])
