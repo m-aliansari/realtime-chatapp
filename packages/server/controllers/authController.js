@@ -1,5 +1,5 @@
 import { compare, hash } from "bcrypt"
-import { pool } from "../db"
+import { pool } from "../db.js"
 
 export const handleLogin = async (req, res) => {
     const potentialLogin = await pool.query(

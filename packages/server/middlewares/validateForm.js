@@ -1,5 +1,12 @@
 import { formSchema } from "@realtime-chatapp/common";
 
+/**
+    * Limits API requests by user IP.
+    * @param {import("express").Request} req - Request object.
+    * @param {import("express").Response} res - Response object.
+    * @param {import("express").NextFunction} next - The next function.
+    * @returns {import("express").Response | void} 
+*/
 const validateForm = async (req, res, next) => {
     const formData = req.body;
     try {

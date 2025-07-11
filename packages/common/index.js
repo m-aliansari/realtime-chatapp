@@ -10,3 +10,5 @@ export const formSchema = object({
         .min(6, "Password too short")
         .max(28, "Password too long"),
 })
+
+export const appName = 'realtime-chatapp'

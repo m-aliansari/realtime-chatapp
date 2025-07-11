@@ -8,9 +8,9 @@ import { ROUTES } from "./constants/routes.js";
 import { CLIENT_BASE_URL } from "./constants/client.js";
 import http from 'http';
 import session from "express-session";
-import { createClient } from "redis"
 import { RedisStore } from "connect-redis"
-const redisClient = createClient()
+import { redisClient } from "./redis.js";
+import { appName } from "@realtime-chatapp/common";
 
 redisClient.connect().catch(console.error)
 
@@ -32,7 +32,7 @@ app.use(cors({
 }))
 app.use(json())
 app.use(session({
-    store: new RedisStore({ client: redisClient, prefix: "realtime-chatapp:" }),
+    store: new RedisStore({ client: redisClient, prefix: `${appName}:` }),
     secret: process.env.COOKIE_SECRET,
     credentials: true,
     name: "sid",
