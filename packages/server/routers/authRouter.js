@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { ROUTES } from '../constants/routes.js'
-import validateForm from '../middlewares/validateForm.js'
+import validateForm from '../middlewares/express/validateForm.js'
 import { handleCheckLogin, handleLogin, handleRegister } from '../controllers/authController.js'
-import { rateLimiter } from "../middlewares/rateLimiter.js"
+import { rateLimiter } from "../middlewares/express/rateLimiter.js"
 const router = Router()
 
 router

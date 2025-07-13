@@ -11,12 +11,12 @@ import {
 } from "@chakra-ui/react";
 
 import { MdChat } from "react-icons/md";
-import { FriendContext } from "../../../contexts/FriendsContext";
+import { FriendsContext } from "../../../contexts/Friends/FriendsContext";
 import { useContext } from "react";
 import { AddFriendModal } from "./AddFriendModal";
 
 export const SideBar = () => {
-  const { friendList } = useContext(FriendContext);
+  const { friendList } = useContext(FriendsContext);
 
   return (
     <Dialog.Root placement="center" motionPreset="slide-in-bottom">
@@ -35,8 +35,8 @@ export const SideBar = () => {
             friendList.map((friend) => (
               <HStack
                 as={Tabs.Trigger}
-                value={friend.id}
-                key={friend.id}
+                value={friend}
+                key={friend}
                 w="100%"
               >
                 <Circle
@@ -44,7 +44,7 @@ export const SideBar = () => {
                   w="20px"
                   h="20px"
                 />
-                <Text>{friend.username}</Text>
+                <Text>{friend}</Text>
               </HStack>
             ))
           ) : (

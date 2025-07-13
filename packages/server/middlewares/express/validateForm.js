@@ -12,7 +12,6 @@ const validateForm = async (req, res, next) => {
     try {
         const valid = await authFormSchema.validate(formData)
         if (!valid) {
-            console.log('form is not good')
             res.status(422).send()
         };
         return next()

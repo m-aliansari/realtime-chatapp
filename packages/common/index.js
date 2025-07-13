@@ -14,3 +14,8 @@ export const authFormSchema = object({
 export const appName = 'realtime-chatapp'
 
 export const friendFormSchema = authFormSchema.omit(['password'])
+
+export const SOCKET_EVENTS = {
+    ADD_FRIEND: "add_friend",
+    FRIENDS_LIST: "friends_list"
+}

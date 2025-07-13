@@ -1,9 +1,9 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { ROUTES } from "../../../server/constants/routes";
 import { useAuth } from "../hooks/useAuth";
+import { ROUTE_NAMES } from "../constants/routes.js";
 
 export const PrivateRoutes = () => {
   const isAuth = useAuth();
-  return isAuth ? <Outlet /> : <Navigate to={ROUTES.AUTH.LOGIN} />;
+  return isAuth ? <Outlet /> : <Navigate to={ROUTE_NAMES.LOGIN} />;
 };

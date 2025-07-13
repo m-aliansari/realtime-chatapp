@@ -5,51 +5,41 @@ import { Server } from "socket.io";
 import cors from "cors";
 import authRouter from "./routers/authRouter.js";
 import { ROUTES } from "./constants/routes.js";
-import { CLIENT_BASE_URL } from "./constants/client.js";
 import http from 'http';
-import session from "express-session";
-import { RedisStore } from "connect-redis"
-import { redisClient } from "./redis.js";
-import { appName } from "@realtime-chatapp/common";
+import { redisClient } from "./utils/redis.js";
+import { sessionMiddleware, socketCompatibleMiddleware } from "./middlewares/express/session.js";
+import { corsConfig } from "./constants/cors.js";
+import { authorizeUser } from "./middlewares/socket/authorizeUser.js";
+import { SOCKET_EVENTS } from "@realtime-chatapp/common";
+import { handleSocketAddFriend, initializeUser } from "./utils/socket.js";
 
 redisClient.connect().catch(console.error)
 
 const app = express();
-
 const server = http.createServer(app)
 
 const socketio = new Server(server, {
-    cors: {
-        origin: CLIENT_BASE_URL,
-        credentials: true
-    }
+    cors: corsConfig
 })
 
+// express middlewares
 app.use(helmet())
-app.use(cors({
-    origin: CLIENT_BASE_URL,
-    credentials: true
-}))
+app.use(cors(corsConfig))
 app.use(json())
-app.use(session({
-    store: new RedisStore({ client: redisClient, prefix: `${appName}:` }),
-    secret: process.env.COOKIE_SECRET,
-    credentials: true,
-    name: "sid",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        expires: 1000 * 60 * 60 * 24 * 7,
-        secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax"
-    }
-}))
+app.use(sessionMiddleware)
 
+// routers
 app.use(ROUTES.AUTH.BASE, authRouter)
 
+// socket middlewares
+socketio.use(socketCompatibleMiddleware(sessionMiddleware))
+socketio.use(authorizeUser)
 
-socketio.on("connect", socket => { })
+socketio.on("connect", async socket => {
+    await initializeUser(socket)
+    socket.on(SOCKET_EVENTS.ADD_FRIEND, (username, cb) => { handleSocketAddFriend(socket, username, cb) })
+})
+
 
 server.listen(4000, () => {
     console.log("Server listening on port 4000");

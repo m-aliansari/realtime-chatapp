@@ -2,19 +2,39 @@ import {
   Button,
   CloseButton,
   Dialog,
+  Heading,
   Portal,
   useDialogContext,
 } from "@chakra-ui/react";
 import { TextField } from "../../common/TextField";
 import { Form, Formik } from "formik";
-import { friendFormSchema } from "@realtime-chatapp/common";
+import { friendFormSchema, SOCKET_EVENTS } from "@realtime-chatapp/common";
+import { socket } from "../../../utils/socket.js";
+import { useContext, useEffect, useState } from "react";
+import { FriendsContext } from "../../../contexts/Friends/FriendsContext.js";
 
 export const AddFriendModal = () => {
+  const [error, setError] = useState("");
   const dialog = useDialogContext();
+  const { setFriendList } = useContext(FriendsContext);
   const handleSubmit = (values, actions) => {
+    socket.emit(
+      SOCKET_EVENTS.ADD_FRIEND,
+      values.username,
+      ({ errorMsg, done }) => {
+        if (done) {
+          setError("");
+          setFriendList((c) => [values.username, ...c]);
+          return dialog.setOpen(false);
+        }
+        setError(errorMsg);
+      }
+    );
     actions.resetForm();
-    dialog.setOpen(false);
   };
+  useEffect(() => {
+    if (!dialog.open) setError("");
+  }, [dialog.open]);
   return (
     <Portal>
       <Dialog.Backdrop />
@@ -30,6 +50,14 @@ export const AddFriendModal = () => {
           >
             <Form>
               <Dialog.Body>
+                <Heading
+                  as="p"
+                  color="red.500"
+                  textAlign="center"
+                  fontSize="xl"
+                >
+                  {error}
+                </Heading>
                 <TextField
                   label="Friend's username"
                   placeholder="Enter Friend's username"

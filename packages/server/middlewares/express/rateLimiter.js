@@ -1,6 +1,6 @@
 
 import { appName } from "@realtime-chatapp/common"
-import { redisClient } from "../redis.js"
+import { redisClient } from "../../utils/redis.js"
 
 /**
     * Limits API requests by user IP.

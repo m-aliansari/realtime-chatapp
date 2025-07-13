@@ -1,9 +1,9 @@
 import { Tabs, VStack } from "@chakra-ui/react";
-import { FriendContext } from "../../contexts/FriendsContext";
+import { FriendsContext } from "../../contexts/Friends/FriendsContext.js";
 import { useContext } from "react";
 
 export const ChatMessages = () => {
-  const { friendList } = useContext(FriendContext);
+  const { friendList } = useContext(FriendsContext);
   return (
     <VStack justify="center" p="5rem">
       {friendList?.length ? (
