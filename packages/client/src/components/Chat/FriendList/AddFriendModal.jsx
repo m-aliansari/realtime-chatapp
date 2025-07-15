@@ -21,10 +21,10 @@ export const AddFriendModal = () => {
     socket.emit(
       SOCKET_EVENTS.ADD_FRIEND,
       values.username,
-      ({ errorMsg, done }) => {
+      ({ errorMsg, done, addedFriend }) => {
         if (done) {
           setError("");
-          setFriendList((c) => [values.username, ...c]);
+          setFriendList((c) => [{ ...addedFriend }, ...c]);
           return dialog.setOpen(false);
         }
         setError(errorMsg);

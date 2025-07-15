@@ -4,11 +4,9 @@ import { ChatMessages } from "./Chat/ChatMessages";
 import { FriendsContextProvider } from "../contexts/Friends/FriendsContextProvider";
 import { useSocketSetup } from "../hooks/useSocketSetup.jsx";
 import { FriendsContext } from "../contexts/Friends/FriendsContext.js";
-import { useContext } from "react";
 
 export const Home = () => {
-  const { setFriendList } = useContext(FriendsContext);
-  useSocketSetup(setFriendList);
+  useSocketSetup();
   return (
     <Tabs.Root
       templateColumns={"repeat(10, 1fr)"}

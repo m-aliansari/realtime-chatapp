@@ -35,8 +35,8 @@ export const SideBar = () => {
             friendList.map((friend) => (
               <HStack
                 as={Tabs.Trigger}
-                value={friend}
-                key={friend}
+                value={friend.user_id}
+                key={friend.user_id}
                 w="100%"
               >
                 <Circle
@@ -44,7 +44,7 @@ export const SideBar = () => {
                   w="20px"
                   h="20px"
                 />
-                <Text>{friend}</Text>
+                <Text>{friend.username}</Text>
               </HStack>
             ))
           ) : (

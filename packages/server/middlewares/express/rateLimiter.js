@@ -12,11 +12,19 @@ import { redisClient } from "../../utils/redis.js"
 export const rateLimiter = (secondsLimit, limitAmount) => async (req, res, next) => {
     const ip = req.socket.remoteAddress
     const key = `${appName}:rate-limit:${ip}`
-    const [response] = await redisClient.multi().incr(key).expire(key, secondsLimit).exec();
 
-    if (response > limitAmount)
-        return res
-            .status(429)
-            .json({ loggedIn: false, status: "Too many requests" })
-    return next()
+    try {
+        const [response] = await redisClient.multi().incr(key).expire(key, secondsLimit).exec();
+
+        if (response > limitAmount)
+            return res
+                .status(429)
+                .json({ loggedIn: false, status: "Too many requests" })
+        return next()
+
+    } catch (error) {
+        console.log("error in rate limiter");
+        console.log(error);
+
+    }
 }

@@ -5,28 +5,33 @@ import { v4 as uuidv4 } from "uuid"
 import { checkUserExists } from "../utils/users.js"
 
 export const handleLogin = async (req, res) => {
-    const potentialLogin = await pool.query(
-        GET_USER_BY_USERNAME,
-        [req.body.username]
-    )
+    try {
+        const potentialLogin = await pool.query(
+            GET_USER_BY_USERNAME,
+            [req.body.username]
+        )
+        if (potentialLogin.length === 0)
+            return res.json({ loggedIn: false, status: "Wrong username or password!" })
 
-    if (potentialLogin.length === 0)
-        return res.json({ loggedIn: false, status: "Wrong username or password!" })
 
+        const isPassCorrect = compare(req.body.password, potentialLogin[0].passhash)
 
-    const isPassCorrect = compare(req.body.password, potentialLogin[0].passhash)
+        if (!isPassCorrect)
+            return res.json({ loggedIn: false, status: "Wrong username or password!" })
 
-    if (!isPassCorrect)
-        return res.json({ loggedIn: false, status: "Wrong username or password!" })
+        const { username, user_id, id } = potentialLogin[0]
 
-    const { username, user_id, id } = potentialLogin[0]
-
-    req.session.user = {
-        username,
-        user_id,
-        id
+        req.session.user = {
+            username,
+            user_id,
+            id
+        }
+        return res.json({ loggedIn: true, username: username })
+    } catch (error) {
+        console.log("error in handle login");
+        
+        console.log(error);
     }
-    return res.json({ loggedIn: true, username: username })
 }
 
 export const handleCheckLogin = async (req, res) => {

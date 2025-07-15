@@ -6,14 +6,14 @@ import cors from "cors";
 import authRouter from "./routers/authRouter.js";
 import { ROUTES } from "./constants/routes.js";
 import http from 'http';
-import { redisClient } from "./utils/redis.js";
 import { sessionMiddleware, socketCompatibleMiddleware } from "./middlewares/express/session.js";
 import { corsConfig } from "./constants/cors.js";
 import { authorizeUser } from "./middlewares/socket/authorizeUser.js";
 import { SOCKET_EVENTS } from "@realtime-chatapp/common";
-import { handleSocketAddFriend, initializeUser } from "./utils/socket.js";
+import { handleDisconnect, handleSocketAddFriend, initializeUser } from "./utils/socket.js";
+import { redisClient } from "./utils/redis.js";
 
-redisClient.connect().catch(console.error)
+redisClient.connect().catch(console.error);
 
 const app = express();
 const server = http.createServer(app)
@@ -35,9 +35,10 @@ app.use(ROUTES.AUTH.BASE, authRouter)
 socketio.use(socketCompatibleMiddleware(sessionMiddleware))
 socketio.use(authorizeUser)
 
-socketio.on("connect", async socket => {
+socketio.on("connection", async socket => {
     await initializeUser(socket)
     socket.on(SOCKET_EVENTS.ADD_FRIEND, (username, cb) => { handleSocketAddFriend(socket, username, cb) })
+    socket.on(SOCKET_EVENTS.DISCONNECT, () => { handleDisconnect(socket) })
 })
 
 

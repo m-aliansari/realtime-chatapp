@@ -16,6 +16,7 @@ const validateForm = async (req, res, next) => {
         };
         return next()
     } catch (err) {
+        console.log("error in validateForm");
         console.log(err.errors)
         res.status(422).send()
     }

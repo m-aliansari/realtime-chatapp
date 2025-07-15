@@ -17,5 +17,8 @@ export const friendFormSchema = authFormSchema.omit(['password'])
 
 export const SOCKET_EVENTS = {
     ADD_FRIEND: "add_friend",
-    FRIENDS_LIST: "friends_list"
+    FRIENDS_LIST: "friends_list",
+    DISCONNECT: "disconnecting",
+    CONNECT: "connect",
+    CONNECTION_STATUS_CHANGED: "connection_status_changed"
 }

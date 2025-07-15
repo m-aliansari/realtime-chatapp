@@ -3,7 +3,7 @@ import { pool } from "./postgres.js"
 
 export const checkUserExists = async username => {
     try {
-        await pool.query(
+        const existingUser = await pool.query(
             CHECK_USER_EXISTS,
             [username]
         )
@@ -12,6 +12,8 @@ export const checkUserExists = async username => {
         }
         return false
     } catch (error) {
+        console.log("error in checkUserExists");
+        
         console.log(error);
 
         return false

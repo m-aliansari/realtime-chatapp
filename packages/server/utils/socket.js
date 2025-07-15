@@ -1,16 +1,43 @@
 import { appName, SOCKET_EVENTS } from "@realtime-chatapp/common"
 import { redisClient } from "./redis.js"
 
+const getHashMapKey = (username) => `${appName}:user_id:${username}`
+const getFriendsListKey = (username) => `${appName}:friends:${username}`
+
+const parseFriendList = async (friendList) => {
+    const newFriendList = []
+
+    for (let friend of friendList) {
+        const [friendUsername, friendUserId] = friend.split(".")
+
+        const friendConnected = (await redisClient.hGet(getHashMapKey(friendUsername), "connected")) === "true"
+
+        newFriendList.push({
+            username: friendUsername,
+            user_id: friendUserId,
+            connected: friendConnected
+        })
+    }
+
+    return newFriendList
+}
+
 export const initializeUser = async socket => {
-    socket.user = { ...socket.request.session.user }
     await redisClient.hSet(
-        `${appName}:user_id:${socket.user.username}`,
-        "user_id", socket.user.user_id
+        getHashMapKey(socket.user.username),
+        {
+            "user_id": socket.user.user_id,
+            "connected": "true"
+        }
     )
 
-    const friendList = await redisClient.lRange(`${appName}:friends:${socket.user.username}`, 0, -1)
+    const key = getFriendsListKey(socket.user.username)
+    const friendList = await redisClient.lRange(key, 0, -1)
 
-    socket.emit(SOCKET_EVENTS.FRIENDS_LIST, friendList)
+
+    const parsedList = await emitConnectionStatus(socket, true, friendList)
+
+    socket.emit(SOCKET_EVENTS.FRIENDS_LIST, parsedList)
 }
 
 export const handleSocketAddFriend = async (socket, username, cb) => {
@@ -19,18 +46,18 @@ export const handleSocketAddFriend = async (socket, username, cb) => {
         return
     }
 
-    const friendUserID = await redisClient.hGet(
-        `${appName}:user_id:${username}`,
-        "user_id"
+    const key = getHashMapKey(username)
+    const friend = await redisClient.hGetAll(
+        key
     )
 
-    if (!friendUserID) {
+    if (!friend) {
         cb({ done: false, errorMsg: "No such user exists!" })
         return
     }
 
     const currentFriendList = await redisClient.lRange(
-        `${appName}:friends:${socket.user.username}`,
+        getFriendsListKey(socket.user.username),
         0, -1
     )
 
@@ -40,10 +67,50 @@ export const handleSocketAddFriend = async (socket, username, cb) => {
     }
 
     await redisClient.lPush(
-        `${appName}:friends:${socket.user.username}`,
-        username
+        getFriendsListKey(socket.user.username),
+        [username, friend.user_id].join(".")
     )
 
-    cb({ done: true })
+    cb({ done: true, addedFriend: { username, user_id: friend.user_id, connected: (friend.connected ?? "false") === "true" } })
     return
+}
+
+export const handleDisconnect = async socket => {
+    try {
+        await redisClient.hSet(
+            getHashMapKey(socket.user.username),
+            { "connected": "false" }
+        )
+    } catch (error) {
+        console.log("error in handleDisconnect");
+
+        console.log(error);
+    }
+
+    await emitConnectionStatus(socket, false)
+}
+
+const emitConnectionStatus = async (socket, connected, friends = null) => {
+    let friendList = friends ? [...friends] : null;
+
+    if (!friendList) {
+        friendList = await redisClient.lRange(
+            getFriendsListKey(socket.user.username),
+            0,
+            -1
+        )
+    }
+
+    const parsed = await parseFriendList(friendList)
+
+    const friendRooms = parsed.map(
+        friend => friend.user_id
+    )
+
+    if (friendRooms?.length)
+        socket
+            .to(friendRooms)
+            .emit(SOCKET_EVENTS.CONNECTION_STATUS_CHANGED, connected, socket.user.username)
+
+    return parsed
 }
