@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Login } from "./Auth/Login";
 import { Signup } from "./Auth/Signup";
@@ -7,9 +7,11 @@ import { Text } from "@chakra-ui/react";
 import { UserContext } from "../contexts/UserContext";
 import { Home } from "./Home";
 import { FriendsContextProvider } from "../contexts/Friends/FriendsContextProvider.jsx";
+import { MessagesContextProvider } from "../contexts/Messages/MessagesContextProvider.jsx";
 
 export const Views = () => {
   const { user } = useContext(UserContext);
+  
   return user.loggedIn === null ? (
     <Text>Loading....</Text>
   ) : (
@@ -21,7 +23,9 @@ export const Views = () => {
           path="/home"
           element={
             <FriendsContextProvider>
-              <Home />
+              <MessagesContextProvider>
+                <Home />
+              </MessagesContextProvider>
             </FriendsContextProvider>
           }
         />

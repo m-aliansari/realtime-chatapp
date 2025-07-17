@@ -7,11 +7,23 @@ import { FriendsContext } from "../contexts/Friends/FriendsContext.js";
 export const useSocketSetup = () => {
   const { setUser } = useContext(UserContext);
   const { setFriendList } = useContext(FriendsContext);
+
   useEffect(() => {
     socket.connect();
 
     socket.on(SOCKET_EVENTS.FRIENDS_LIST, (friendList) => {
       setFriendList(friendList);
+    });
+
+    socket.on(SOCKET_EVENTS.FRIEND_ADDED, (newFriend) => {
+      setFriendList((prevList) => {
+        const friendExists = prevList.find(
+          (friend) => friend.user_id === newFriend.user_id
+        );
+
+        if (friendExists) return prevList;
+        return [...prevList, newFriend];
+      });
     });
 
     socket.on(SOCKET_EVENTS.CONNECTION_STATUS_CHANGED, (status, username) => {
@@ -25,15 +37,18 @@ export const useSocketSetup = () => {
       });
     });
 
-    socket.on("connect_error", (e) => {
+    socket.on(SOCKET_EVENTS.CONNECTION_ERROR, (e) => {
+      console.log("connection error in useSocketSetup hook");
       console.log(e);
 
-      console.log("connection error in useSocketSetup hook");
       setUser({ loggedIn: false });
     });
 
     return () => {
-      socket.removeAllListeners();;
+      socket.off(SOCKET_EVENTS.FRIENDS_LIST);
+      socket.off(SOCKET_EVENTS.FRIEND_ADDED);
+      socket.off(SOCKET_EVENTS.CONNECTION_STATUS_CHANGED);
+      socket.off(SOCKET_EVENTS.CONNECTION_ERROR);
     };
-  }, []);
+  }, [setUser, setFriendList]);
 };

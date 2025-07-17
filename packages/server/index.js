@@ -10,8 +10,12 @@ import { sessionMiddleware, socketCompatibleMiddleware } from "./middlewares/exp
 import { corsConfig } from "./constants/cors.js";
 import { authorizeUser } from "./middlewares/socket/authorizeUser.js";
 import { SOCKET_EVENTS } from "@realtime-chatapp/common";
-import { handleDisconnect, handleSocketAddFriend, initializeUser } from "./utils/socket.js";
 import { redisClient } from "./utils/redis.js";
+import { handleDirectMessage } from "./utils/socket/directMessage.js";
+import { handleSocketAddFriend } from "./utils/socket/handleSocketAddFriend.js";
+import { handleDisconnect } from "./utils/socket/handleDisconnect.js";
+import { initializeUser } from "./utils/socket/initializeUser.js";
+import { disconnectTimers } from "./constants/socket.js";
 
 redisClient.connect().catch(console.error);
 
@@ -37,8 +41,34 @@ socketio.use(authorizeUser)
 
 socketio.on("connection", async socket => {
     await initializeUser(socket)
+
+    if (disconnectTimers.has(socket.user.username)) {
+        clearTimeout(disconnectTimers.get(socket.user.username));
+        disconnectTimers.delete(socket.user.username);
+    }
+
     socket.on(SOCKET_EVENTS.ADD_FRIEND, (username, cb) => { handleSocketAddFriend(socket, username, cb) })
-    socket.on(SOCKET_EVENTS.DISCONNECT, () => { handleDisconnect(socket) })
+    socket.on(SOCKET_EVENTS.DIRECT_MESSAGE, (message, cb) => { handleDirectMessage(socket, message, cb) })
+    socket.on(SOCKET_EVENTS.DISCONNECT, () => {
+        const timer = setTimeout(() => {
+            handleDisconnect(socket);
+            disconnectTimers.delete(socket.user.username);
+        }, 3000);
+
+        disconnectTimers.set(socket.user.username, timer);
+    })
+    socket.on(SOCKET_EVENTS.FRIEND_REQUEST_RECEIVED, () => { handleDisconnect(socket) })
+    socket.on(SOCKET_EVENTS.TYPING, ({ to }) => {
+        if (to) {
+            socket.to(to).emit(SOCKET_EVENTS.TYPING, { from: socket.user.user_id });
+        }
+    });
+
+    socket.on(SOCKET_EVENTS.STOP_TYPING, ({ to }) => {
+        if (to) {
+            socket.to(to).emit(SOCKET_EVENTS.TYPING, { from: socket.user.user_id });
+        }
+    });
 })
 
 

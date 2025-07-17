@@ -1,5 +1,5 @@
 import { Field, Input } from "@chakra-ui/react";
-import { useField, Field as FormikField } from "formik";
+import { useField } from "formik";
 
 export const TextField = ({ label, ...props }) => {
   const [field, meta] = useField(props);
