@@ -72,7 +72,7 @@ socketio.on("connection", async socket => {
     });
 })
 
-
-server.listen(4000, () => {
+const PORT = process.env.PORT; 
+server.listen(PORT, () => {
     console.log("Server listening on port 4000");
 })
