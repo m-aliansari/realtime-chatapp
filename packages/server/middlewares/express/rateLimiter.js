@@ -10,7 +10,7 @@ import { redisClient } from "../../utils/redis.js"
     * @returns {import("express").Response | void} 
 */
 export const rateLimiter = (secondsLimit, limitAmount) => async (req, res, next) => {
-    const ip = req.socket.remoteAddress
+    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress
     const key = `${appName}:rate-limit:${ip}`
 
     try {
@@ -25,6 +25,8 @@ export const rateLimiter = (secondsLimit, limitAmount) => async (req, res, next)
     } catch (error) {
         console.log("error in rate limiter");
         console.log(error);
-
+        return res
+            .status(500)
+            .json({ loggedIn: false, status: "Internal server error" })
     }
 }

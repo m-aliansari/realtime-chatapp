@@ -4,11 +4,10 @@
     "main": "index.js",
     "license": "MIT",
     "scripts": {
-        "start:server": "yarn --cwd packages/server/ dev",
-        "start:client": "yarn --cwd packages/client/ dev",
-        "common": "cd packages/common",
-        "server": "cd packages/server",
-        "client": "cd packages/client"
+        "dev:server": "yarn workspace @realtime-chatapp/server dev",
+        "dev:client": "yarn workspace @realtime-chatapp/client dev",
+        "build:client": "yarn workspace @realtime-chatapp/client build",
+        "start:server": "yarn workspace @realtime-chatapp/server start"
     },
     "workspaces": [
         "packages/*"

@@ -34,6 +34,7 @@ app.use(sessionMiddleware)
 
 // routers
 app.use(ROUTES.AUTH.BASE, authRouter)
+app.set("trust proxy", 1) 
 
 // socket middlewares
 socketio.use(socketCompatibleMiddleware(sessionMiddleware))

@@ -1,6 +1,6 @@
-import { CLIENT_BASE_URL } from "./client.js"
+import { CLIENT_BASE_URL, CLIENT_BASE_URL_DEV } from "./client.js"
 
 export const corsConfig = {
-    origin: [CLIENT_BASE_URL, "http://localhost:4173"],
+    origin: [CLIENT_BASE_URL, CLIENT_BASE_URL_DEV],
     credentials: true
 }
