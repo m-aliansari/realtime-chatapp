@@ -3,7 +3,6 @@
     "version": "1.0.0",
     "main": "index.js",
     "license": "MIT",
-    "private": "true",
     "scripts": {
         "dev:server": "yarn workspace @realtime-chatapp/server dev",
         "dev:client": "yarn workspace @realtime-chatapp/client dev",
@@ -12,5 +11,6 @@
     },
     "workspaces": [
         "packages/*"
-    ]
+    ],
+    "packageManager": "yarn@4.9.2"
 }

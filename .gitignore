@@ -39,5 +39,9 @@ coverage/
 
 .history
 
-# yarn
-install-state.gz
+# Yarn Berry (v2+)
+.pnp.*
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
